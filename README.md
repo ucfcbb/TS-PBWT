@@ -21,7 +21,7 @@ TS-PBWT program has the following parameters:
 - m, or map `<INPUT GENETIC MAP FILE>`, where `<INPUT GENETIC MAP FILE>` is the input genetic map path and file name (optional; required if unit of cutoff length is set to genetic).
 - u, or unit `<UNIT OF CUTOFF LENGTH>`, where `<UNIT OF CUTOFF LENGTH>` is the unit of cutoff length of an IBD (optional; 0 if physical distance is used; 1 if genetic distance is used (input genetic map is required); default is 0).
 - l, or length `<MINIMUM CUTOFF LENGTH>`, where `<MINIMUM CUTOFF LENGTH>` is the minimum cutoff length of an IBD (optional; default is 0).
-- o, or output `<OUTPUT IBD FILE>`, where `<OUTPUT IBD FILE>` is the output directory path for all files (optional; default is "./output.ibd").
+- o, or output `<OUTPUT IBD FILE>`, where `<OUTPUT IBD FILE>` is the output inferred IBD segments path and file name (optional; default is "./output.ibd").
 
 An example command of running the TS-PBWT program using physical distance 1 megabases (Mb) as the minimum cutoff length of an IBD:
 ```
