@@ -3,6 +3,7 @@
 //  * Description: A method of Identity by Descent inference from a tree sequence.
 //  * Author: Yuan Wei 
 //  * Created on: Jan 17, 2025
+//  * Modified on: Mar 06, 2025
 //  * --------------------------------------------------------------------------------------------------------
 
 #include <iostream>
@@ -186,11 +187,11 @@ void build_prefix_divergence(int site_index, vector<int> & prefix, vector<int> &
 
 //output ibd segments by pbwt for an interval in the middle
 void get_long_matches_not_last_site_with_cutoff(int site_index, vector<int> & prefix, vector<int> & divergence, vector<int> & prefix_prev, vector<int> & divergence_prev, vector<bool> & sites, int unit_of_cutoff, double cutoff_length, vector<int> & physical_positions, map<int, double> & genetic_map, unsigned long long int & number_of_ibds, unsigned long long int & length_of_ibds, ofstream & output_data){
-    if (cutoff_length >= 0){
+    if (cutoff_length > 0){
         vector<int> list_0;
         vector<int> list_1;
         for (unsigned long int i = 0; i < divergence_prev.size(); i++){
-            if (cutoff_length == 0 ? site_index - divergence_prev[i] < cutoff_length : (unit_of_cutoff == 0 ? physical_positions[site_index + 1] - physical_positions[divergence_prev[i]] < cutoff_length : genetic_map[physical_positions[site_index + 1]] - genetic_map[physical_positions[divergence_prev[i]]] < cutoff_length)){
+            if (unit_of_cutoff == 0 ? physical_positions[site_index + 1] - physical_positions[divergence_prev[i]] < cutoff_length : genetic_map[physical_positions[site_index + 1]] - genetic_map[physical_positions[divergence_prev[i]]] < cutoff_length){
                 if (list_0.size() > 0 && list_1.size() > 0){
                     int is = min(list_0[0], list_1[0]);
                     int ie = max(list_0[list_0.size() - 1], list_1[list_1.size() - 1]);
@@ -255,10 +256,10 @@ void get_long_matches_not_last_site_with_cutoff(int site_index, vector<int> & pr
 
 //output ibd segments by pbwt for an interval at the end
 void get_long_matches_last_site_with_cutoff(int site_index, vector<int> & prefix, vector<int> & divergence, int unit_of_cutoff, double cutoff_length, vector<int> & physical_positions, map<int, double> & genetic_map, unsigned long long int & number_of_ibds, unsigned long long int & length_of_ibds, ofstream & output_data){
-    if (cutoff_length >= 0){
+    if (cutoff_length > 0){
         vector<int> list_t;
         for (unsigned long int i = 0; i < divergence.size(); i++){
-            if (cutoff_length == 0 ? site_index + 1 - divergence[i] < cutoff_length : (unit_of_cutoff == 0 ? physical_positions[site_index + 1] - physical_positions[divergence[i]] < cutoff_length : genetic_map[physical_positions[site_index + 1]] - genetic_map[physical_positions[divergence[i]]] < cutoff_length)){
+            if (unit_of_cutoff == 0 ? physical_positions[site_index + 1] - physical_positions[divergence[i]] < cutoff_length : genetic_map[physical_positions[site_index + 1]] - genetic_map[physical_positions[divergence[i]]] < cutoff_length){
                 if (list_t.size() > 1){
                     for (unsigned long int i1 = 0; i1 < list_t.size(); i1++){
                         int dst = 0;
@@ -312,7 +313,7 @@ static void show_usage(string program_name){
     cout << "\t-h,--help\t\t\t\t\tShow this help message\n";
     cout << "\t-t,--trees <INPUT TREE SEQUENCE FILE>\t\tInput tree sequence path and file name\n";
     cout << "\t-m,--map <INPUT GENETIC MAP FILE>\t\tInput genetic map path and file name\n";
-    cout << "\t-l,--length <MINIMUM CUTOFF LENGTH>\t\tMinimum cutoff length of an IBD (default is 0)\n";
+    cout << "\t-l,--length <MINIMUM CUTOFF LENGTH>\t\tMinimum cutoff length of an IBD (default is 1 base pair)\n";
     cout << "\t-u,--unit <UNIT OF CUTOFF LENGTH>\t\tUnit of cutoff length of an IBD (0: physical; 1: genetic (input genetic map is required); default is 0)\n";
     cout << "\t-o,--output <OUTPUT IBD FILE>\t\t\tOutput ibd path and file name (default is \"./output.ibd\")\n";
 }
@@ -325,7 +326,7 @@ int main(int argc, char *argv[]){
         string input_ts_file;
         string input_map_file;
         string output_ibd_file = "./output.ibd";
-        double min_cutoff_length = 0.0; //default is 0
+        double min_cutoff_length = 1; //default is 1 base pair
         int unit_of_cutoff_length = 0; //0: physical; 1: genetic (input genetic map is required); default is 0
 
         //get command line arguments
@@ -413,6 +414,11 @@ int main(int argc, char *argv[]){
         if (unit_of_cutoff_length != 0 && unit_of_cutoff_length != 1){
             unit_of_cutoff_length = 0;
             cout << "unit_of_cutoff_length is set to: " << unit_of_cutoff_length << endl;
+        }
+
+        if (min_cutoff_length <= 0){
+            min_cutoff_length = 1;
+            cout << "min_cutoff_length is set to: " << min_cutoff_length << endl;
         }
 
         ofstream output_file_data;
